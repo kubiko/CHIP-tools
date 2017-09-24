@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 
 TIMEOUT=30
 FEL=${FEL:-sunxi-fel}
@@ -34,11 +34,11 @@ onMac() {
 
 #------------------------------------------------------------
 filesize() {
-  if onMac; then
-    stat -f "%z" $1
-  else
+  # if onMac; then
+  #   stat -f "%z" $1
+  # else
     stat --printf="%s" $1
-  fi
+  # fi
 }
 
 #------------------------------------------------------------
@@ -160,13 +160,13 @@ flash_images() {
 
   echo "echo Configuring Video Mode" >> $ubootcmds
   if [ "$FLAVOR" = "pocketchip" ]; then
-  
+
     echo "setenv clear_fastboot 'i2c mw 0x34 0x4 0x00 4;'" >> $ubootcmds
     echo "setenv write_fastboot 'i2c mw 0x34 0x4 66 1; i2c mw 0x34 0x5 62 1; i2c mw 0x34 0x6 30 1; i2c mw 0x34 0x7 00 1'" >> $ubootcmds
     echo "setenv test_fastboot 'i2c read 0x34 0x4 4 0x80200000; if itest.s *0x80200000 -eq fb0; then echo (Fastboot); i2c mw 0x34 0x4 0x00 4; fastboot 0; fi'" >> $ubootcmds
 
     echo "setenv bootargs root=ubi0:rootfs rootfstype=ubifs rw ubi.mtd=4 quiet lpj=501248 loglevel=3 splash plymouth.ignore-serial-consoles" >> $ubootcmds
-    echo "setenv bootpaths 'initrd noinitrd'" >> $ubootcmds
+    echo "setenv bootpaths 'snappy initrd noinitrd'" >> $ubootcmds
     echo "setenv bootcmd '${NO_LIMIT}run test_fastboot; if test -n \${fel_booted} && test -n \${scriptaddr}; then echo (FEL boot); source \${scriptaddr}; fi; for path in \${bootpaths}; do run boot_\$path; done'" >> $ubootcmds
     echo "setenv boot_initrd 'mtdparts; ubi part UBI; ubifsmount ubi0:rootfs; ubifsload \$fdt_addr_r /boot/$DTB_NAME; ubifsload 0x44000000 /boot/initrd.uimage; ubifsload \$kernel_addr_r /boot/zImage; bootz \$kernel_addr_r 0x44000000 \$fdt_addr_r'" >> $ubootcmds
     echo "setenv boot_noinitrd 'mtdparts; ubi part UBI; ubifsmount ubi0:rootfs; ubifsload \$fdt_addr_r /boot/$DTB_NAME; ubifsload \$kernel_addr_r /boot/zImage; bootz \$kernel_addr_r - \$fdt_addr_r'" >> $ubootcmds
@@ -178,7 +178,7 @@ flash_images() {
     echo "setenv bootdelay 1" >> $ubootcmds
   else
 
-    echo "setenv bootpaths 'initrd noinitrd'" >> $ubootcmds
+    echo "setenv bootpaths 'snappy initrd noinitrd'" >> $ubootcmds
     echo "setenv bootcmd '${NO_LIMIT}run test_fastboot; if test -n \${fel_booted} && test -n \${scriptaddr}; then echo (FEL boot); source \${scriptaddr}; fi; for path in \${bootpaths}; do run boot_\$path; done'" >> $ubootcmds
     echo "setenv boot_initrd 'mtdparts; ubi part UBI; ubifsmount ubi0:rootfs; ubifsload \$fdt_addr_r /boot/$DTB_NAME; ubifsload 0x44000000 /boot/initrd.uimage; ubifsload \$kernel_addr_r /boot/zImage; bootz \$kernel_addr_r 0x44000000 \$fdt_addr_r'" >> $ubootcmds
     echo "setenv boot_noinitrd 'mtdparts; ubi part UBI; ubifsmount ubi0:rootfs; ubifsload \$fdt_addr_r /boot/$DTB_NAME; ubifsload \$kernel_addr_r /boot/zImage; bootz \$kernel_addr_r - \$fdt_addr_r'" >> $ubootcmds

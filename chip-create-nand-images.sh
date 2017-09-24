@@ -47,7 +47,7 @@ prepare_ubi() {
   else
     lebsize=$((eraseblocksize-pagesize*2))
   fi
-  
+
   if [ "$osize" = "100" ]; then
     #TOSH_512_SLC
     volspec="vol_flags=autoresize"
@@ -62,8 +62,9 @@ prepare_ubi() {
 	exit 1
   fi
 
-  mkdir -p $rootfs
-  tar -xf $rootfstar -C $rootfs
+  # mkdir -p $rootfs
+  # tar -xf $rootfstar -C $rootfs
+  rootfs=$rootfstar
   ${MKFS_UBIFS} -d $rootfs -m $pagesize -e $lebsize -c $maxlebcount -o $ubifs
   echo "[rootfs]
 mode=ubi
@@ -136,7 +137,7 @@ prepare_uboot() {
 mkdir -p $OUTPUTDIR
 cp $UBOOTDIR/spl/sunxi-spl.bin $OUTPUTDIR/
 cp $UBOOTDIR/u-boot-dtb.bin $OUTPUTDIR/
-cp $ROOTFSTAR $OUTPUTDIR/
+cp -r $ROOTFSTAR $OUTPUTDIR/
 
 ## prepare ubi images ##
 # Toshiba SLC image:
